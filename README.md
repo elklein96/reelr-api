@@ -1,16 +1,8 @@
-# reelr - WebAPI
+# reelr
 
 ## What is this?
 
-This is the WebAPI for reelr; a dynamic interface for a movie server. 
-
-## How is this different from Plex?
-
-Plex trascodes data as it streams from server to client. This is all good, but when it comes to slower processors like the Raspberry Pi, Plex can be problematic.  reelr is simply a front end that streams movie files as-is; no transcoding involved.
-
-## What are some new features?
-
-reelr is now equipped with an administrator page for editing stored media fields as well as improved metadata acquisition and parsing.
+reelr is a lightweight, dynamic interface for a movie server. 
 
 ## Wow, that's great. How do I use this?
 
@@ -20,22 +12,22 @@ There are a few steps before we can start installing reelr.
 
     ```
     git clone https://github.com/elklein96/reelr
+    git clone https://github.com/elklein96/reelr-api
     ```
 
 2. Install some dependencies
 
     ```
+    cd reelr
+    npm i
+    cd ../reelr-api
     npm i
     ```
 
-    > For local development, make sure to have MongoDB installed
+3. A note on local development:
 
-3. Start the app
-
-    ```
-    npm start
-    ```
-
-    > This takes care of Angular compilation, starting a MongoDB instance, and watching for any changes
+    - `npm run start` transpiles the source to ES2015 and spins up an Express server
+    - `npm run lint` runs ESLint
+    - `npm run test` runs Mocha
 
 And that's it! Have fun!
