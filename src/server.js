@@ -4,18 +4,18 @@ import http from 'http';
 import mongoose from 'mongoose';
 
 import { logErrors, errorHandler } from './core/error-handler';
-import { routes } from './routes/movies.js';
+import { routes } from './routes/movies';
 
-const dbUrl = "mongodb://localhost:27017/media";
+const dbUrl = 'mongodb://localhost:27017/media';
 mongoose.connect(dbUrl);
 
-let app = express();
+const app = express();
 
 app.server = http.createServer(app);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
-  extended: true
+    extended: true
 }));
 
 app.use(logErrors);

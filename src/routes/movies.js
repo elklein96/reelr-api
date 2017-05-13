@@ -80,20 +80,22 @@ export function routes(app) {
         }
 
         function addMovieToMongo(data) {
-            const movie = mongoose.Movie({
-                director    : '',
-                duration    : data.runtime,
-                genre       : data.genres[0].name,
-                id          : data.imdb_id,
-                path        : '',
-                plot        : data.overview,
-                poster_url  : 'https://image.tmdb.org/t/p/w640/' + data.poster_path,
-                title       : data.title,
-                year        : data.release_date
-            });
+            return new Promise(function(resolve, reject) {
+                const movie = mongoose.Movie({
+                    director    : '',
+                    duration    : data.runtime,
+                    genre       : data.genres[0].name,
+                    id          : data.imdb_id,
+                    path        : '',
+                    plot        : data.overview,
+                    poster_url  : 'https://image.tmdb.org/t/p/w640/' + data.poster_path,
+                    title       : data.title,
+                    year        : data.release_date
+                });
 
-            movie.save({}, (err, movies) => {
-                err ? reject(err) : resolve({ data: "success" });
+                movie.save({}, (err, movies) => {
+                    err ? reject(err) : resolve({ data: 'success' });
+                });
             });
         }
     }
