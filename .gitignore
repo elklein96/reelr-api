@@ -1,0 +1,9 @@
+node_modules/
+dist/
+coverage/
+
+npm-debug*
+
+# Environment-specific configuration - NEVER commit to Git
+config.json
+.vscode/
