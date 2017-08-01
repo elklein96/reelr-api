@@ -12,4 +12,4 @@ const movieSchema = mongoose.Schema({
     year        : String
 });
 
-export default mongoose.model('movie', movieSchema);
+export default mongoose.model('Movie', movieSchema);
