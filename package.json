@@ -12,6 +12,7 @@
     "body-parser": "~1.13.3",
     "express": "~4.13.3",
     "mongoose": "~4.9.8",
+    "query-string": "~5.0.0",
     "request": "~2.81.0"
   },
   "devDependencies": {

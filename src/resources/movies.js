@@ -1,21 +1,26 @@
 import mongoose from 'mongoose';
+import qs from 'querystring';
 import request from 'request';
 
 import Movie from '../core/movie.model';
 
 const tmdbKey = require('../../config.json').tmdb_api_key;
+const movieSchema = Object.keys(Movie.schema.obj);
 
 export function getMovies (req, res, next) {
-    let movieList = [];
-    const query = (req.query.id) ? { 'title': req.query.id } : {};
+    const query = Object.keys(req.query).filter((el) => {
+        return movieSchema.includes(el);
+    }).reduce((accumulator, val) => {
+        accumulator[val] = new RegExp(req.query[val]);
+        return accumulator;
+    }, {});
 
     Movie.find(query, (err, movies) => {
         if (err) {
             return next(err);
         } else {
-            movieList = movies.map((movie) => {
+            const movieList = movies.map((movie) => {
                 return {
-                    counter   : movie.counter,
                     director  : movie.director,
                     duration  : movie.duration,
                     genre     : movie.genre,
@@ -52,7 +57,6 @@ export function createMovie (req, res, next) {
             const options = {
                 url: `https://api.themoviedb.org/3/search/movie?api_key=${tmdbKey}&query=${movie.title}
                         &primary_release_year=${movie.year}&page=1&include_adult=false&language=en-US`,
-                headers: { 'User-Agent': 'request' },
                 json: true
             };
 
@@ -66,7 +70,6 @@ export function createMovie (req, res, next) {
         return new Promise ((resolve, reject) => {
             const options = {
                 url: `https://api.themoviedb.org/3/movie/${id}?api_key=${tmdbKey}&language=en-US`,
-                headers: { 'User-Agent': 'request' },
                 json: true
             };
 
@@ -81,11 +84,11 @@ export function createMovie (req, res, next) {
             const movie = Movie({
                 director    : '',
                 duration    : data.runtime,
-                genre       : data.genres[0].name,
+                genre       : data.genres.reduce((acc, val) => { return acc.concat(val.name); }, []),
                 id          : data.imdb_id,
                 path        : '',
                 plot        : data.overview,
-                poster_url  : 'https://image.tmdb.org/t/p/w640/' + data.poster_path,
+                poster_url  : `https://image.tmdb.org/t/p/w640/${data.poster_path}`,
                 title       : data.title,
                 year        : data.release_date
             });
