@@ -1,5 +1,3 @@
-import mongoose from 'mongoose';
-import qs from 'querystring';
 import request from 'request';
 
 import Movie from '../core/movie.model';
