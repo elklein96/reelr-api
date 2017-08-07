@@ -23,6 +23,7 @@ app.use(logErrors);
 app.use(errorHandler);
 
 app.get('/api/movies', movies.getMovies);
+app.get('/api/movies/all', movies.getMovieByTitle);
 app.post('/api/movies', movies.createMovie);
 
 app.server.listen(process.env.PORT || 3001);

@@ -39,6 +39,39 @@ export function getMovies (req, res, next) {
     });
 }
 
+export function getMovieByTitle (req, res, next) {
+    findMovieByTitleAndYear()
+        .then((data) => {
+            data = data.map((el) => {
+                const obj = {
+                    title: el.title,
+                    date: el.release_date,
+                    poster: el.poster_path
+                };
+                return obj;
+            });
+
+            res.status(200).send(data);
+            return next();
+        })
+        .catch(next);
+
+    function findMovieByTitleAndYear () {
+        return new Promise ((resolve, reject) => {
+            const movie = req.query.movie;
+            const options = {
+                url: `https://api.themoviedb.org/3/search/movie?api_key=${tmdbKey}&query=${movie}
+                    &page=1&include_adult=false&language=en-US`,
+                json: true
+            };
+
+            request(options, (err, res, body) => {
+                return err ? reject(err) : resolve(body.results);
+            });
+        });
+    }
+}
+
 export function createMovie (req, res, next) {
     findMovieByTitleAndYear()
         .then(getMovieDataById)
