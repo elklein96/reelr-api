@@ -40,7 +40,7 @@ export function getMovies (req, res, next) {
 }
 
 export function getMovieByTitle (req, res, next) {
-    findMovieByTitleAndYear()
+    queryMovieByTitle()
         .then((data) => {
             data = data.map((el) => {
                 const obj = {
@@ -56,7 +56,7 @@ export function getMovieByTitle (req, res, next) {
         })
         .catch(next);
 
-    function findMovieByTitleAndYear () {
+    function queryMovieByTitle () {
         return new Promise ((resolve, reject) => {
             const movie = req.query.movie;
             const options = {
