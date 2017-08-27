@@ -13,7 +13,7 @@ export function getMovies (req, res, next) {
         return accumulator;
     }, {});
 
-    Movie.find(query, (err, movies) => {
+    Movie.find(query).sort({ title: 1 }, (err, movies) => {
         if (err) {
             return next(err);
         } else {
