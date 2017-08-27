@@ -117,7 +117,7 @@ export function createMovie (req, res, next) {
                 duration    : data.runtime,
                 genre       : data.genres.reduce((acc, val) => { return acc.concat(val.name); }, []),
                 id          : data.imdb_id,
-                path        : '',
+                path        : `/media/Movies/${data.title}`,
                 plot        : data.overview,
                 poster_url  : `https://image.tmdb.org/t/p/w640/${data.poster_path}`,
                 title       : data.title,
