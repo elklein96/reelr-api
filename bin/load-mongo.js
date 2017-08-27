@@ -31,7 +31,7 @@ function iterateOverBatch () {
     setTimeout(() => {
         processMovie(batch[batchCounter++]);
         iterateOverBatch();
-    }, 333);
+    }, 1000);
 }
 
 function processMovie (movie) {
