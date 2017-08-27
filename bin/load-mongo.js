@@ -22,26 +22,16 @@ const movieSchema = mongoose.Schema({
 });
 
 const Movie = mongoose.model('Movie', movieSchema);
+const batch = fs.readdirSync(movieDir);
+let batchCounter = 0;
 
-const MAX_BATCH_SIZE = 40;
-let currentBatch = 0;
+iterateOverBatch();
 
-fs.readdirSync(movieDir).map(parseMovie);
-
-async function parseMovie (file) {
-    if (file && file.charAt(0) !== '.') {
-        if (currentBatch < MAX_BATCH_SIZE) {
-            console.log('STALLING FOR TMDB API');
-            currentBatch = 0;
-            await sleep(5000);
-        }
-        processMovie(file.replace(/\.[^/.]+$/, ''));
-        currentBatch++;
-    }
-}
-
-function sleep (ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+function iterateOverBatch () {
+    setTimeout(() => {
+        processMovie(batch[batchCounter++]);
+        iterateOverBatch();
+    }, 333);
 }
 
 function processMovie (movie) {
