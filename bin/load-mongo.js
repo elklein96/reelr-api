@@ -3,7 +3,7 @@ const request = require('request');
 const mongoose = require('mongoose');
 
 const tmdbKey = require('../config.json').tmdb_api_key;
-const movieDir = require('../config.json').movie_base_directory;
+const batchDir = require('../config.json').movie_base_directory;
 const dbUrl = 'mongodb://localhost:27017/media';
 
 mongoose.Promise = global.Promise;
@@ -22,30 +22,37 @@ const movieSchema = mongoose.Schema({
 });
 
 const Movie = mongoose.model('Movie', movieSchema);
-const batch = fs.readdirSync(movieDir);
+const batch = fs.readdirSync(batchDir);
 let batchCounter = 0;
 
 iterateOverBatch();
 
 function iterateOverBatch () {
+    // Rate limiting for TMDB API
     setTimeout(() => {
-        processMovie(batch[batchCounter++]);
-        iterateOverBatch();
+        if (batchCounter < batch.length) {
+            processMovie(batch[batchCounter++]);
+            iterateOverBatch();
+        } else {
+            process.exit(0);
+        }
     }, 1000);
 }
 
 function processMovie (movie) {
-    findMovieByTitle()
-        .then(getMovieDataById)
-        .then(addMovieToMongo)
-        .then((data) => {
-            console.log('Success');
-        })
-        .catch((err) => {
-            console.log(`Error: ${err}`);
-        });
+    if (movie.charAt(0) !== '.') {
+        findMovieByTitle(movie)
+            .then(getMovieDataById)
+            .then(addMovieToMongo)
+            .then((data) => {
+                console.log(`Successfully added ${data.title}`);
+            })
+            .catch((err) => {
+                console.log(`ERROR:: ${err}`);
+            });
+    }
 
-    function findMovieByTitle () {
+    function findMovieByTitle (movie) {
         return new Promise ((resolve, reject) => {
             const options = {
                 url: `https://api.themoviedb.org/3/search/movie?api_key=${tmdbKey}&query=${movie}
@@ -74,12 +81,20 @@ function processMovie (movie) {
 
     function addMovieToMongo (data) {
         return new Promise ((resolve, reject) => {
+            const movieDir = fs.readdirSync(`${batchDir}/${data.title}`);
+
+            if (movieDir.length > 1) {
+                console.log(`WARNING:: Found multiple files in ${batchDir}/${data.title}. Selected ${movieDir[0]} as the media file`);
+            } else if (movieDir.length <= 0) {
+                reject(`Could not find media file in ${batchDir}/${data.title}`);
+            }
+
             const movie = Movie({
                 director    : '',
                 duration    : data.runtime,
                 genre       : data.genres.reduce((acc, val) => { return acc.concat(val.name); }, []),
                 id          : data.imdb_id,
-                path        : `/media/Movies/${data.title}`,
+                path        : `${batchDir}/${data.title}/${movieDir[0]}`,
                 plot        : data.overview,
                 poster_url  : `https://image.tmdb.org/t/p/w640/${data.poster_path}`,
                 title       : data.title,
@@ -87,7 +102,7 @@ function processMovie (movie) {
             });
 
             movie.save({}, (err, movies) => {
-                return err ? reject(err) : resolve({ data: 'success' });
+                return err ? reject(err) : resolve({ title: data.title });
             });
         });
     }
