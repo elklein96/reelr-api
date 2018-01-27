@@ -1,0 +1,5 @@
+#!/usr/bin/env node
+
+process.title = 'Reelr - Register New User';
+
+require('../lib/register-user');

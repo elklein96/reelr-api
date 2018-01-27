@@ -1,6 +1,6 @@
 import request from 'request';
 
-import Movie from '../core/movie.model';
+import Movie from '../core/models/movie.model';
 
 const tmdbKey = require('../../config.json').tmdb_api_key;
 const movieSchema = Object.keys(Movie.schema.obj);
