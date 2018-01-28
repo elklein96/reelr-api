@@ -5,7 +5,7 @@ import Movie from '../core/models/movie.model';
 const tmdbKey = require('../../config.json').tmdb_api_key;
 const movieSchema = Object.keys(Movie.schema.obj);
 
-export function getMovies (req, res, next) {
+export function getMovies(req, res, next) {
     const query = Object.keys(req.query).filter((el) => {
         return movieSchema.includes(el);
     }).reduce((accumulator, val) => {
@@ -39,7 +39,7 @@ export function getMovies (req, res, next) {
     });
 }
 
-export function getMovieByTitle (req, res, next) {
+export function getMovieByTitle(req, res, next) {
     queryMovieByTitle()
         .then((data) => {
             data = data.map((el) => {
@@ -56,8 +56,8 @@ export function getMovieByTitle (req, res, next) {
         })
         .catch(next);
 
-    function queryMovieByTitle () {
-        return new Promise ((resolve, reject) => {
+    function queryMovieByTitle() {
+        return new Promise((resolve, reject) => {
             const movie = req.query.movie;
             const options = {
                 url: `https://api.themoviedb.org/3/search/movie?api_key=${tmdbKey}&query=${movie}
@@ -72,7 +72,7 @@ export function getMovieByTitle (req, res, next) {
     }
 }
 
-export function createMovie (req, res, next) {
+export function createMovie(req, res, next) {
     findMovieByTitleAndYear()
         .then(getMovieDataById)
         .then(addMovieToMongo)
@@ -82,8 +82,8 @@ export function createMovie (req, res, next) {
         })
         .catch(next);
 
-    function findMovieByTitleAndYear () {
-        return new Promise ((resolve, reject) => {
+    function findMovieByTitleAndYear() {
+        return new Promise((resolve, reject) => {
             const movie = req.body.movie;
             const options = {
                 url: `https://api.themoviedb.org/3/search/movie?api_key=${tmdbKey}&query=${movie.title}
@@ -97,8 +97,8 @@ export function createMovie (req, res, next) {
         });
     }
 
-    function getMovieDataById (id) {
-        return new Promise ((resolve, reject) => {
+    function getMovieDataById(id) {
+        return new Promise((resolve, reject) => {
             const options = {
                 url: `https://api.themoviedb.org/3/movie/${id}?api_key=${tmdbKey}&language=en-US`,
                 json: true
@@ -110,8 +110,8 @@ export function createMovie (req, res, next) {
         });
     }
 
-    function addMovieToMongo (data) {
-        return new Promise ((resolve, reject) => {
+    function addMovieToMongo(data) {
+        return new Promise((resolve, reject) => {
             const movie = Movie({
                 director    : '',
                 duration    : data.runtime,

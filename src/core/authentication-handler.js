@@ -1,44 +1,51 @@
-import passport from 'passport';
 import crypto from 'crypto';
-import LocalStrategy from 'passport-local';
-
+import jwt from 'jsonwebtoken';
 import User from './models/user.model';
 
-const passportConfig = {
-    usernameField: 'username',
-    passwordField: 'password',
-    passReqToCallback: true
-};
+const envConfig = require('../../config.json');
 
-passport.use('local-login', new LocalStrategy(passportConfig,
-    (req, username, password, done) => {
-        User.findOne({ username: username }, (err, user) => {
-            if (err) {
-                return done(err);
-            }
-            if (!user) {
-                return done(null, false, { message: 'Incorrect username.' });
-            }
-            user = user.toObject();
-            if (!isValidPassword(user, password)) {
-                return done(null, false, { message: 'Incorrect password.' });
-            }
-            return done(null, user);
-        });
-    }
-));
-
-passport.serializeUser((user, done) => {
-    done(null, user._id);
-});
-
-passport.deserializeUser((id, done) => {
-    User.findById(id, (err, user) => {
-        done(err, user);
+export function logIn(req, res, next) {
+    User.findOne({ username: req.body.username }, (err, user) => {
+        if (err) {
+            return sendResponse(500, err, res, next);
+        }
+        if (!user) {
+            return sendResponse(401, { message: 'Incorrect username.' }, res, next);
+        }
+        user = user.toObject();
+        if (!isValidPassword(user, req.body.password)) {
+            return sendResponse(401, { message: 'Incorrect password.' }, res, next);
+        }
+        setJwt(user, res);
+        return sendResponse(200, { message: 'Ok.' }, res, next);
     });
-});
+}
 
-function isValidPassword (user, password) {
+export function verifyJwt(req, res, next) {
+    const token = req.cookies.reelr_jwt;
+
+    if (!token) {
+        return sendResponse(401, { message: 'Missing authentication cookie.' }, res, next);
+    }
+
+    jwt.verify(token, envConfig.jwt_secret_key, (err, decoded) => {
+        if (err) {
+            return sendResponse(401, { message: 'Invalid authentication cookie.' }, res, next);
+        }
+        return sendResponse(200, { message: 'Ok.' }, res, next);
+    });
+}
+
+function sendResponse(status, message, res, next) {
+    res.status(status).send(message);
+}
+
+function setJwt(user, res) {
+    const token = jwt.sign({ username: user.username }, envConfig.jwt_secret_key);
+    res.cookie('reelr_jwt', token);
+}
+
+function isValidPassword(user, password) {
     const hashedLoginValue = sha512(password, user.salt);
     return hashedLoginValue === user.hashedPassword;
 }
