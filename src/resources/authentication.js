@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import User from './models/user.model';
+import User from '../core/models/user.model';
 
 const envConfig = require('../../config.json');
 
@@ -34,6 +34,11 @@ export function verifyJwt(req, res, next) {
         }
         return sendResponse(200, { message: 'Ok.' }, res, next);
     });
+}
+
+export function logOut(req, res, next) {
+    res.clearCookie('reelr_jwt');
+    return sendResponse(200, { message: 'Ok.' }, res, next);
 }
 
 function sendResponse(status, message, res, next) {

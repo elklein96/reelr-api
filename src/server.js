@@ -4,8 +4,8 @@ import cookieParser from 'cookie-parser';
 import http from 'http';
 import mongoose from 'mongoose';
 
-import { logIn, verifyJwt } from './core/authentication-handler';
 import { logErrors, errorHandler } from './core/error-handler';
+import { logIn, verifyJwt, logOut } from './resources/authentication';
 import * as movies from './resources/movies';
 
 const dbUrl = 'mongodb://localhost:27017/media';
@@ -30,6 +30,7 @@ app.get('/api/movies/all', movies.getMovieByTitle);
 app.post('/api/movies', movies.createMovie);
 app.get('/api/login', verifyJwt);
 app.post('/api/login', logIn);
+app.delete('/api/login', logOut);
 
 app.server.listen(process.env.PORT || 3001);
 console.log(`Express server listening on port ${app.server.address().port}`);
