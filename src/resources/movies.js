@@ -9,7 +9,7 @@ export function getMovies(req, res, next) {
     const query = Object.keys(req.query).filter((el) => {
         return movieSchema.includes(el);
     }).reduce((accumulator, val) => {
-        accumulator[val] = new RegExp(req.query[val]);
+        accumulator[val] = new RegExp(req.query[val], 'i');
         return accumulator;
     }, {});
 
