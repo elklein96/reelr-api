@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 
 import { logErrors, errorHandler } from './core/error-handler';
 import { logIn, verifyJwt, logOut } from './resources/authentication';
+import { logEvent } from './resources/analytics';
 import * as movies from './resources/movies';
 
 const dbUrl = 'mongodb://localhost:27017/media';
@@ -31,6 +32,7 @@ app.post('/api/movies', movies.createMovie);
 app.get('/api/login', verifyJwt);
 app.post('/api/login', logIn);
 app.delete('/api/login', logOut);
+app.post('/api/activity', logEvent);
 
 app.server.listen(process.env.PORT || 3001);
 console.log(`Express server listening on port ${app.server.address().port}`);
